@@ -1,0 +1,14 @@
+<launch>
+<node pkg="master_discovery_fkie" type="master_discovery" name="master_discovery">
+<param name="mcast_group" value="224.0.0.1"/>
+</node>
+<node name="my_master_sync_fkie" pkg="master_sync_fkie" type="master_sync">
+  <rosparam>
+    sync_topics:
+      - '/joy'
+  </rosparam>
+</node>
+<node name="pwm_output" pkg="uri_usv" type="pwm_joy" launch-prefix="sudo -E"/>
+<node name="heartbeat_sender" pkg="uri_usv" type="heartbeat_sender" />
+
+</launch>

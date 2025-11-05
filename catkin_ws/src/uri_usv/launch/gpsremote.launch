@@ -1,0 +1,136 @@
+<launch>
+     <node name="pwm_output" pkg="uri_usv" type="pwm_output"   launch-prefix="sudo -E" >
+     <param name="frequency" value="100.00"/>
+     </node>
+ <node name="heartbeat_sender" pkg="uri_usv" type="heartbeat_sender" />
+	 	 <node name="switch_io" pkg="uri_usv" type="switch_io"  />
+	 <node name="light_io" pkg="uri_usv" type="light_io" />
+    <node name="imu" pkg="uri_usv" type="imu" >
+	      <remap from="/sensor/m_heading" to="/heading/m_heading" />
+      </node>
+   <node name="bl_gps" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 1 base_link gps" />
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true">
+    <param name="frequency" value="0.5"/>
+    <param name="sensor_timeout" value="2.0"/>
+    <param name="two_d_mode" value="true"/>
+    <param name="map_frame" value="map"/>
+    <param name="odom_frame" value="odom"/>
+    <param name="base_link_frame" value="base_link"/>
+    <param name="world_frame" value="odom"/>
+    <param name="publish_tf" value="true"/>
+    <param name="imu0" value="/sensor/m_imu"/>
+    <rosparam param="imu0_config">[false, false, false,
+                                   false,  false,  true,
+                                   false,  false,  false,
+                                   false,  false,  true,
+                                   false,  false,  false]</rosparam>
+    <param name="imu0_differential" value="false"/>
+    <param name="imu0_remove_gravitational_acceleration" value="true"/>
+
+    <param name="odom0" value="/odometry/gps"/>
+    <rosparam param="odom0_config">[true,  true,  true,
+                                   false, false, false,
+                                   false, false, false,
+                                   false, false, false,
+                                   false, false, false]</rosparam>
+	<rosparam param="process_noise_covariance">[1e-4, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    1e-4, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    1e-4, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    1e-4, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    1e-4, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    1e-4, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    1e-5, 0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     1e-5, 0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     1e-5, 0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-6, 0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-6, 0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-6, 0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-8, 0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-8, 0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-8]</rosparam>
+		<rosparam param="initial_estimate_covariance">[1e-0, 0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    1e-0, 0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    1e-0, 0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    1e-0, 0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    1e-0, 0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    1e-0, 0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    1e-3, 0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    1e-3, 0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    1e-3, 0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-3,  0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     1e-3,  0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     1e-3,  0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     1e-6, 0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    1e-6, 0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1e-6]</rosparam>
+    <param name="odom0_differential" value="false"/>
+ </node>
+  <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" clear_params="true">
+    <param name="frequency" value="0.5"/>
+<param name="delay" value="0.2"/>
+    <param name="magnetic_declination_radians" value="0"/>
+    <param name="yaw_offset" value="0"/>
+    <param name="zero_altitude" value="true"/>
+    <param name="broadcast_utm_transform" value="true"/>
+    <param name="wait_for_datum" value="false"/>
+    <remap from="imu/data" to="/sensor/m_imu"/>
+      <remap from="gps/fix" to="/sensor/m_fix"/>
+     <remap from="odometry/filtered" to="odometry/filtered"/>
+      
+  </node>
+   
+  <arg name="port" default="/dev/ttyACM0" />
+  <arg name="baud" default="9600" />
+  <arg name="frame_id" default="gps" />
+  <arg name="use_GNSS_time" default="False" />
+  <arg name="time_ref_source" default="gps" />
+  <arg name="useRMC" default="False" />
+
+  <node name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver" output="screen">
+    <param name="port" value="$(arg port)"/>
+    <param name="baud" value="$(arg baud)" />
+    <param name="frame_id" value="$(arg frame_id)" />
+    <param name="use_GNSS_time" value="$(arg use_GNSS_time)" />
+    <param name="time_ref_source" value="$(arg time_ref_source)" />
+	<remap from="/fix" to="/sensor/m_fix" />
+    <param name="useRMC" value="$(arg useRMC)" />
+  </node>	 
+    <node name="encoder" pkg="uri_usv" type="encoder" launch-prefix="sudo -E"/>
+	<node name="heading" pkg="uri_usv" type="heading" ns="heading" >
+	  <param name="rpm1" value="300.00" />
+      <param name="rpm2" value="650.00" />
+      <param name="rpm3" value="1000.00" />
+      <param name="leftturn_portrpm" value="-600.00" />
+      <param name="leftturn_stdbrpm" value="600.00" />
+      <param name="rightturn_stdbrpm" value="-600.00" />
+      <param name="rightturn_portrpm" value="600.00" />
+      <remap from="/heading/c_stdbrpm" to="/stdb_motor/c_stdbrpm" />
+      <remap from="/heading/c_portrpm" to="/port_motor/c_portrpm" />
+      <remap from="/heading/stdb_reverse" to="/stdb_motor/stdb_reverse" />
+      <remap from="/heading/port_reverse" to="/port_motor/port_reverse" />
+      </node>
+     <!--node name="VI_sensor" pkg="uri_usv" type="VI_sensor"  /-->
+	 <node name="controller" pkg="pid" type="controller" ns="heading" >
+      <param name="Kp" value="3" />
+      <param name="Ki" value="0" />
+      <param name="Kd" value="6" />
+      <param name="upper_limit" value="5" />
+      <param name="lower_limit" value="-5" />
+      <param name="windup_limit" value="1" />
+      <param name="max_loop_frequency" value="10.0" />
+      <param name="min_loop_frequency" value="10.0" />
+	  <param name="angle_error" value="true" />
+	  <param name="topic_from_controller" value="diff_rpm" />
+      <param name="topic_from_plant" value="m_heading" />
+	  <param name="setpoint_topic" value="c_heading" />
+     </node>
+<node pkg="master_discovery_fkie" type="master_discovery" name="master_discovery">
+<param name="mcast_group" value="224.0.0.1"/>
+</node>
+<node name="my_master_sync_fkie" pkg="master_sync_fkie" type="master_sync">
+  <rosparam>
+    sync_topics:
+      - '/joy'
+  </rosparam>
+</node>
+</launch>

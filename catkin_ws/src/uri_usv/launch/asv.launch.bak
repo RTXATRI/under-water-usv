@@ -1,0 +1,32 @@
+<launch>
+	 <node name="joy_switch" pkg="add" type="joy_switch" ns="heading"  />
+	 <node name="light_control" pkg="add" type="light_control" />
+    <node name="imu" pkg="asv_control" type="imu" >
+      <remap from="/heading" to="/heading/heading_angle" />
+     </node>
+    <node name="encoder" pkg="asv_control" type="encoder" >
+      <remap from="/rightrpm" to="/right_motor/rightrpm" />
+      <remap from="/leftrpm" to="/left_motor/leftrpm" />
+     </node>
+	<node name="joy_rpm" pkg="asv_control" type="joy_rpm" ns="heading"/>
+	<node name="headingcontrol" pkg="asv_control" type="heading" ns="heading" output="screen" >
+	  <param name="rpm1" value="300.00" />
+      <param name="rpm2" value="600.00" />
+      <param name="rpm3" value="900.00" />
+      <param name="rpm4" value="1200.00" />
+      <param name="l_leftrpm" value="-600.00" />
+      <param name="l_rightrpm" value="600.00" />
+      <param name="r_rightrpm" value="-600.00" />
+      <param name="r_leftrpm" value="600.00" />
+      <remap from="/heading/d_rightrpm" to="/right_motor/d_rightrpm" />
+      <remap from="/heading/d_leftrpm" to="/left_motor/d_leftrpm" />
+      <remap from="/heading/r_reverse" to="/right_motor/r_reverse" />
+      <remap from="/heading/l_reverse" to="/left_motor/l_reverse" />
+      </node>
+     <node name="set_left_pwm" pkg="asv_control" type="leftpwm" ns="left_motor"  />
+     <node name="set_right_pwm" pkg="asv_control" type="rightpwm" ns="right_motor" />
+	 <node name="joy_node" pkg="asv_control" type="joy" ns="heading">
+		<param name="autorepeat_rate" value="200" />
+	 </node>
+	 <include file="$(find pid)/launch/pid.launch" />
+</launch>

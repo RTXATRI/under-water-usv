@@ -1,0 +1,44 @@
+<launch>
+	<node name="joy_node" pkg="uri_usv" type="joy" >
+	<param name="autorepeat_rate" value="5" />
+	 </node>
+	<node name="heartbeat_sender" pkg="uri_usv" type="heartbeat_sender" />
+     <node name="pwm_output" pkg="uri_usv" type="dipwm"  output="pwm_output"  >
+     <param name="frequency" value="100.00"/>
+     </node>
+	 <node name="switch_io" pkg="uri_usv" type="switch_io"  />
+	 <node name="light_io" pkg="uri_usv" type="light_io" />
+    <node name="imu" pkg="uri_usv" type="imu" >
+	      <remap from="/sensor/m_heading" to="/heading/m_heading" />
+      </node>
+    <node name="encoder" pkg="uri_usv" type="encoder" />
+	<node name="heading" pkg="uri_usv" type="heading" ns="heading" >
+	  <param name="rpm1" value="300.00" />
+      <param name="rpm2" value="600.00" />
+      <param name="rpm3" value="900.00" />
+      <param name="rpm4" value="1200.00" />
+      <param name="leftturn_portrpm" value="-600.00" />
+      <param name="leftturn_stdbrpm" value="600.00" />
+      <param name="rightturn_stdbrpm" value="-600.00" />
+      <param name="rightturn_portrpm" value="600.00" />
+      <remap from="/heading/c_stdbrpm" to="/stdb_motor/c_stdbrpm" />
+      <remap from="/heading/c_portrpm" to="/port_motor/c_portrpm" />
+      <remap from="/heading/stdb_reverse" to="/stdb_motor/stdb_reverse" />
+      <remap from="/heading/port_reverse" to="/port_motor/port_reverse" />
+      </node>
+     <node name="VI_sensor" pkg="uri_usv" type="VI_sensor"  />
+	 <node name="controller" pkg="pid" type="controller" ns="heading" >
+      <param name="Kp" value="30" />
+      <param name="Ki" value="0" />
+      <param name="Kd" value="60" />
+      <param name="upper_limit" value="100" />
+      <param name="lower_limit" value="-100" />
+      <param name="windup_limit" value="50" />
+      <param name="max_loop_frequency" value="10.0" />
+      <param name="min_loop_frequency" value="10.0" />
+	  <param name="angle_error" value="true" />
+	  <param name="topic_from_controller" value="diff_rpm" />
+      <param name="topic_from_plant" value="m_heading" />
+	  <param name="setpoint_topic" value="c_heading" />
+     </node>
+</launch>
