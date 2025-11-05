@@ -1,0 +1,15 @@
+# For parameter descriptions, please refer to the template parameter files for each node.
+
+navsat_transform:
+  frequency: 10
+  delay: 3
+  magnetic_declination_radians: 0  # For lat/long 55.944831, -3.186998
+  yaw_offset: 0  # IMU reads 0 facing magnetic north, not east
+  zero_altitude: true
+  broadcast_utm_transform: true
+  publish_filtered_gps: true
+  use_odometry_yaw: false
+  wait_for_datum: true
+  datum: [41.8246, -71.3940, 0.0]
+  
+ 

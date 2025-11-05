@@ -1,0 +1,33 @@
+
+<launch>
+ <node name="bl_gps" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 1 base_link gps" />
+  <rosparam command="load" file="$(find robot_localization)/params/navsat.yaml" />
+
+  <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" clear_params="true" output="screen">
+	  <remap from="imu/data" to="/sensor/m_imu"/>
+      <remap from="gps/fix" to="/sensor/m_fix"/>
+      <remap from="odometry/filtered" to="odometry/filtered"/>    
+  </node>
+  
+    <node name="imu" pkg="uri_usv" type="imu" />
+	 
+  <arg name="port" default="/dev/ttyACM0" />
+  <arg name="baud" default="9600" />
+  <arg name="frame_id" default="gps" />
+  <arg name="use_GNSS_time" default="False" />
+  <arg name="time_ref_source" default="gps" />
+  <arg name="useRMC" default="False" />
+
+  <node name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver" output="screen">
+    <param name="port" value="$(arg port)"/>
+    <param name="baud" value="$(arg baud)" />
+    <param name="frame_id" value="$(arg frame_id)" />
+    <param name="use_GNSS_time" value="$(arg use_GNSS_time)" />
+    <param name="time_ref_source" value="$(arg time_ref_source)" />
+	<remap from="/fix" to="/sensor/m_fix" />
+    <param name="useRMC" value="$(arg useRMC)" />
+  </node>
+    <node pkg="tf" type="static_transform_publisher" name="tfgps" args="0 0 0 0 0 0 1 base_link odom 100" />
+   <node pkg="tf" type="static_transform_publisher" name="tfmap" args="0 0 0 0 0 0 1 odom map 100" />
+</launch>
+
