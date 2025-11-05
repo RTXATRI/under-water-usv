@@ -1,0 +1,16 @@
+<launch>
+	<node name="Docking" pkg="mz_usv" type="Docking" >
+		<param name = "K_p"  value ="20"/>
+		<param name = "K_i"   value ="0.00"/>
+		<param name = "K_d"   value ="10"/>
+		<param name = "K_g"   value ="0.0001"/>
+		<param name = "Total_thrust" value ="1.8"/>
+        <remap from="/gnc/port_cmd" to="/thrusters/port_cmd" />
+        <remap from="/gnc/stdb_cmd" to="/thrusters/stdb_cmd" />
+
+	</node>
+	
+	<node name="auto_pwm" pkg="mz_usv" type="auto_pwm" launch-prefix="sudo -E"> 
+	</node>
+	<node name="joy_node" pkg="uri_usv" type="joy" />
+</launch>

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+   <node name="auto_pwm_sim" pkg="mz_usv" type="auto_pwm_sim" launch-prefix="sudo -E"  output="screen"/> 
+</launch>
+
+

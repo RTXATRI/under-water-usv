@@ -1,0 +1,3 @@
+<launch>
+ <node name="depth" pkg="mz_usv" type="depth"  />
+</launch>

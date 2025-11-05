@@ -1,0 +1,20 @@
+<launch>
+ <node name="heartbeat_sender" pkg="mz_usv" type="heartbeat_sender" />
+	<node name="auto_pwm" pkg="mz_usv" type="auto_pwm" output="screen" launch-prefix="sudo -E"> 
+	</node>
+        <node name="joy_node" pkg="uri_usv" type="joy" >
+        </node>
+    <node name="VI_sensor" pkg="mz_usv" type="VI_sensor" /> 
+	<node name="imu" pkg="mz_usv" type="imu" >
+	</node>
+	<node name="light" pkg="mz_usv" type="lights_io" >
+	</node>
+	<node name="imu_filter_node" pkg="imu_filter_madgwick" type="imu_filter_node" >
+		<param name = "constant_dt"  value ="0.0"/>
+		<remap from="imu/data" to="/sensor/m_imu"/>
+		<param name = "world_frame"  value ="enu"/>	
+		<param name = "use_mag"  value ="true"/>	
+		<param name = "use_magnetic_field_msg"  value ="true"/>		
+	</node>
+		<!--gps  /-->
+ </launch>

@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="mz_usv" type="battery_sensor" name="battery_sensor_node" args="2 4800" output="screen"/>
+    
+
+</launch>

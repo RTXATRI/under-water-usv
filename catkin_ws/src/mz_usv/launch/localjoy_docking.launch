@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- mavros /-->
+  <arg name="fcu_url" default="/dev/ttyS1:115200" />
+	<arg name="gcs_url" default="" />
+	<arg name="tgt_system" default="1" />
+	<arg name="tgt_component" default="1" />
+	<arg name="log_output" default="screen" />
+	<arg name="fcu_protocol" default="v2.0" />
+	<arg name="respawn_mavros" default="false" />
+
+	<include file="$(find mavros)/launch/node.launch">
+		<arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+		<arg name="config_yaml" value="$(find mavros)/launch/px4_config.yaml" />
+
+		<arg name="fcu_url" value="$(arg fcu_url)" />
+		<arg name="gcs_url" value="$(arg gcs_url)" />
+		<arg name="tgt_system" value="$(arg tgt_system)" />
+		<arg name="tgt_component" value="$(arg tgt_component)" />
+		<arg name="log_output" value="$(arg log_output)" />
+		<arg name="fcu_protocol" value="$(arg fcu_protocol)" />
+		<arg name="respawn_mavros" default="$(arg respawn_mavros)" />
+	</include>
+
+  <!-- joy /-->
+  <node name="joy_node" pkg="joy" type="joy_node">
+  </node>
+
+  <!-- heartbeat /-->
+  <node name="heartbeat_sender" pkg="mz_usv" type="heartbeat_sender">
+  </node>
+
+	<!-- pwm /-->
+	<node name="auto_pwm" pkg="mz_usv" type="auto_pwm" launch-prefix="sudo -E" output="screen"> 
+  </node>
+
+  <!-- PID /-->
+	<node name="dowmup_PID" pkg="mz_usv" type="dowmup_PID" output="screen">  
+  </node>
+
+  <!-- depth sensor /-->
+  <node name="depth" pkg="mz_usv" type="depth"  > 
+ 	</node>
+
+	<!-- <node name="light" pkg="mz_usv" type="lights_io" >
+	</node> -->
+  <!--odometry  /-->
+  <!--<node name="bl_map" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 1 map odom" />
+  <node name="bl_odom" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 1 odom base_link" />
+  <node name="bl_gps" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 1 odom gps" />
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true">
+    <param name="frequency" value="51"/>
+    <param name="sensor_timeout" value="2.0"/>
+    <param name="two_d_mode" value="true"/>
+    <param name="map_frame" value="map"/>
+    <param name="odom_frame" value="odom"/>
+    <param name="base_link_frame" value="base_link"/>
+    <param name="world_frame" value="odom"/>
+    <param name="publish_tf" value="true"/>
+    <param name="imu0" value="/sensor/m_imu"/>
+    <rosparam param="imu0_config">[false, false, false,
+                                   false,  false,  true,
+                                   false,  false,  false,
+                                   false,  false,  true,
+                                   false,  false,  false]</rosparam>
+    <param name="imu0_differential" value="false"/>
+    <param name="imu0_remove_gravitational_acceleration" value="true"/>
+
+    <param name="odom0" value="/odometry/gps"/>
+    <rosparam param="odom0_config">[true,  true,  true,
+                                   false, false, false,
+                                   false, false, false,
+                                   false, false, false,
+                                   false, false, false]</rosparam>
+	<rosparam param="process_noise_covariance">[1e-3, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    1e-3, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    1e-3, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    1e-8, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    1e-8, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    1e-3, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    1e-8, 0,     0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     1e-8, 0,    0,    0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     1e-3, 0,    0,    0,    0,    0,    0, 
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-8, 0,    0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-8, 0,    0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-8, 0,    0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-8, 0,    0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-8, 0,
+                             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-8]</rosparam>
+		<rosparam param="initial_estimate_covariance">[1e-2, 0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    1e-2, 0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    1e-2, 0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    1e-7, 0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    1e-7, 0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    1e-2, 0,    0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    1e-7, 0,    0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    1e-7, 0,    0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    1e-2, 0,     0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-7,  0,     0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     1e-7,  0,     0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     1e-7,  0,    0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     1e-7, 0,    0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    1e-7, 0,
+                                0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1e-7]</rosparam>
+    <param name="odom0_differential" value="false"/>
+ </node>
+  <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" clear_params="true">
+    <param name="frequency" value="1"/>
+<param name="delay" value="0.2"/>
+    <param name="magnetic_declination_radians" value="0"/>
+    <param name="yaw_offset" value="0"/>
+    <param name="zero_altitude" value="true"/>
+    <param name="broadcast_utm_transform" value="true"/>
+    <param name="wait_for_datum" value="false"/>
+    <remap from="imu/data" to="/sensor/m_imu"/>
+      <remap from="gps/fix" to="/sensor/m_fix"/>
+     <remap from="odometry/filtered" to="odometry/filtered"/>
+  </node>-->
+		<!--usv  /-->
+  <!-- <node pkg="mz_usv" type="battery_sensor" name="battery_sensor_node" args="2 4800" output="screen">
+ </node>-->
+	<!-- <node name="PID" pkg="PID" type="PID" > 
+	</node> -->
+ <!-- <node name="tcp_float" pkg="mz_usv" type="tcp_float" output="screen">  
+	</node> -->
+	<!--node name="VI_sensor" pkg="mz_usv" type="VI_sensor" /--> 
+	<!-- <node name="imu" pkg="mz_usv" type="imu" >
+	</node> -->
+ <!-- <node name="server" pkg="mz_usv" type="server" > 
+ 	</node> -->
+	<!-- <node name="imu_filter_node" pkg="imu_filter_madgwick" type="imu_filter_node" >
+		<param name = "constant_dt"  value ="0.0"/>
+		<remap from="imu/data" to="/sensor/m_imu"/>
+		<param name = "world_frame"  value ="enu"/>	
+		<param name = "use_mag"  value ="true"/>	
+		<param name = "use_magnetic_field_msg"  value ="true"/>		
+	</node>
+	<node name="Docking" pkg="mz_usv" type="Docking" >
+		<param name = "K_p"  value ="10"/>
+		<param name = "K_i"   value ="0.00"/>
+		<param name = "K_d"   value ="20"/>
+		<param name = "K_g"   value ="0.0001"/>
+		<param name = "sleeptime1"  value ="2000000"/>
+		<param name = "sleeptime2"   value ="3000000"/>
+		<param name = "sleeptime3"   value ="3000000"/>
+		<param name = "th_low"   value ="200"/>
+		<param name = "th_middle"   value ="4000"/>
+		<param name = "th_high"   value ="30000"/>
+		<param name = "th_rb"   value ="5"/>
+		<param name = "Total_thrust" value ="1.6"/>
+        <remap from="/gnc/port_cmd" to="/thrusters/port_cmd" />
+        <remap from="/gnc/stdb_cmd" to="/thrusters/stdb_cmd" />
+
+	</node> -->
+	<!--gps  /-->
+  
+  <!-- <arg name="port" default="/dev/ttyS2" />
+  <arg name="baud" default="115200" />
+  <arg name="frame_id" default="gps" />
+  <arg name="use_GNSS_time" default="False" />
+  <arg name="time_ref_source" default="gps" />
+  <arg name="useRMC" default="True" />
+
+  <node name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver">
+    <param name="port" value="$(arg port)"/>
+    <param name="baud" value="$(arg baud)" />
+    <param name="frame_id" value="$(arg frame_id)" />
+    <param name="use_GNSS_time" value="$(arg use_GNSS_time)" />
+    <param name="time_ref_source" value="$(arg time_ref_source)" />
+	<remap from="/fix" to="/sensor/m_fix" />
+	<remap from="/vel" to="/sensor/m_vel" />
+    <param name="useRMC" value="$(arg useRMC)" />
+  </node>
+ <node name="bag_record" pkg="rosbag" type="record" args="record -o /home/ubuntu/bags /depth  /depth_set /joy /imu/rpy /sensor/m_VI"/> -->
+</launch>
+
+

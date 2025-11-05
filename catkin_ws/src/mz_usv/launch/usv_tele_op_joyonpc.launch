@@ -1,0 +1,39 @@
+<launch>
+ <node name="heartbeat_sender" pkg="mz_usv" type="heartbeat_sender" />
+	<node name="rc_pwm" pkg="mz_usv" type="rc_pwm" launch-prefix="sudo -E"/> 
+    <node name="VI_sensor" pkg="mz_usv" type="VI_sensor" /> 
+	<node name="imu" pkg="mz_usv" type="imu" >
+	</node>
+	<node name="light" pkg="mz_usv" type="lights_io" >
+	</node>
+	<node name="imu_filter_node" pkg="imu_filter_madgwick" type="imu_filter_node" >
+		<param name = "constant_dt"  value ="0.0"/>
+		<remap from="imu/data" to="/sensor/m_imu"/>
+		<param name = "world_frame"  value ="enu"/>	
+		<param name = "use_mag"  value ="true"/>	
+		<param name = "use_magnetic_field_msg"  value ="true"/>		
+	</node>
+		<!--gps  /-->
+  <arg name="port" default="/dev/ttyS2" />
+  <arg name="baud" default="115200" />
+  <arg name="frame_id" default="gps" />
+  <arg name="use_GNSS_time" default="False" />
+  <arg name="time_ref_source" default="gps" />
+  <arg name="useRMC" default="True" />
+
+  <node name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver" >
+    <param name="port" value="$(arg port)"/>
+    <param name="baud" value="$(arg baud)" />
+    <param name="frame_id" value="$(arg frame_id)" />
+    <param name="use_GNSS_time" value="$(arg use_GNSS_time)" />
+    <param name="time_ref_source" value="$(arg time_ref_source)" />
+	<remap from="/fix" to="/sensor/m_fix" />
+    <param name="useRMC" value="$(arg useRMC)" />
+  </node>
+    <node pkg="master_discovery_fkie" type="master_discovery" name="master_discovery">
+	<param name="mcast_group" value="224.0.0.1"/>
+	</node>
+	<node name="my_master_sync_fkie" pkg="master_sync_fkie" type="master_sync">
+	<rosparam param="sync_topics">['/joy']</rosparam>
+	</node>
+</launch>

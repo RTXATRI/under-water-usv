@@ -1,0 +1,9 @@
+<launch>
+ <node name="heartbeat_sender" pkg="mz_usv" type="heartbeat_sender" />
+	<node name="auto_pwm" pkg="mz_usv" type="auto_pwm" launch-prefix="sudo -E" /> 
+        <node name="joy_node" pkg="uri_usv" type="joy" >
+        </node>
+	<node name="light" pkg="mz_usv" type="lights_io" >
+ 	<node name="server" pkg="mz_usv" type="server"  > 
+	</node>
+</launch>

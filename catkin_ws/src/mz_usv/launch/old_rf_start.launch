@@ -1,0 +1,8 @@
+<launch>
+    <node pkg="mz_usv" type="rf_node" name="rf_node" args="192.168.10.142 8080" output="screen"/>
+	<include file="$(find mz_usv)/launch/usv_sensor_on.launch"/>
+	<node name="heartbeat_sender" pkg="mz_usv" type="heartbeat_sender" />
+	<node name="auto_pwm" pkg="mz_usv" type="auto_pwm" launch-prefix="sudo -E" output="screen"/> 
+	<node name="joy_node" pkg="uri_usv" type="joy" />
+	<node pkg="mz_usv" type="battery_sensor" name="battery_sensor_node" args="2 4800" output="screen"/>
+</launch>
