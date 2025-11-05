@@ -1,0 +1,44 @@
+<launch>
+    <node name="controller" pkg="pid" type="controller" ns="left_motor"  >
+      <param name="Kp" value="0.12" />
+      <param name="Ki" value="0.02" />
+      <param name="Kd" value="0.08" />
+      <param name="upper_limit" value="100" />
+      <param name="lower_limit" value="-100" />
+      <param name="windup_limit" value="5" />
+      <param name="max_loop_frequency" value="100.0" />
+      <param name="min_loop_frequency" value="10.0" />
+	  <param name="topic_from_controller" value="leftpwm" />
+      <param name="topic_from_plant" value="leftrpm" />
+	  <param name="setpoint_topic" value="d_leftrpm" />
+     </node>
+
+    <node name="controller" pkg="pid" type="controller" ns="right_motor" >
+      <param name="Kp" value="0.12" />
+      <param name="Ki" value="0.02" />
+      <param name="Kd" value="0.08" />
+      <param name="upper_limit" value="100" />
+      <param name="lower_limit" value="-100" />
+      <param name="windup_limit" value="5" />
+      <param name="max_loop_frequency" value="100.0" />
+      <param name="min_loop_frequency" value="10.0" />
+	  <param name="topic_from_controller" value="rightpwm" />
+      <param name="topic_from_plant" value="rightrpm" />
+	  <param name="setpoint_topic" value="d_rightrpm" />
+     </node>
+
+	<node name="controller" pkg="pid" type="controller" ns="heading" >
+      <param name="Kp" value="0" />
+      <param name="Ki" value="0" />
+      <param name="Kd" value="0" />
+      <param name="upper_limit" value="50" />
+      <param name="lower_limit" value="-50" />
+      <param name="windup_limit" value="10" />
+      <param name="max_loop_frequency" value="10.0" />
+      <param name="min_loop_frequency" value="10.0" />
+	  <param name="angle_error" value="true" />
+	  <param name="topic_from_controller" value="diff_rpm" />
+      <param name="topic_from_plant" value="heading_angle" />
+	  <param name="setpoint_topic" value="d_heading" />
+     </node>
+</launch>

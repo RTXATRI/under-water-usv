@@ -1,0 +1,4 @@
+<launch>
+    <node name="px4_node"   pkg="px4"   type="px4_node" output="screen"/>
+    <include file="/opt/ros/kinetic/share/mavros/launch/px4.launch"/>
+</launch>
