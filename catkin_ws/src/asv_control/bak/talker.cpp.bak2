@@ -1,0 +1,56 @@
+/**
+ * 该例程将发布chatter话题，消息类型String
+ */
+ 
+#include <sstream>
+#include "ros/ros.h"
+extern "C"
+{
+#include <bb_blue_api.h>
+}
+#include "std_msgs/String.h"
+
+int main(int argc, char **argv)
+{
+  // ROS节点初始化
+  ros::init(argc, argv, "talker");
+  
+  // 创建节点句柄
+  ros::NodeHandle dmp;
+  
+  // 创建一个Publisher，发布名为chatter的topic，消息类型为std_msgs::String
+  ros::Publisher chatter_pub = dmp.advertise<std_msgs::String>("chatter", 1000);
+
+  // 设置循环的频率
+  ros::Rate loop_rate(2);
+  imu_config_t conf = get_default_imu_config();
+  imu_data_t data;
+  conf.enable_magnetometer = 1;
+  conf.dmp_sample_rate = 4;
+  int count = 0;
+  if(initialize_imu(&data, conf)){
+		printf("initialize_imu_failed\n");
+		return -1;
+  }
+  while (ros::ok())
+  {
+	// 初始化std_msgs::String类型的消息
+    std_msgs::String heading;
+    std::stringstream ss;
+    ss << data.fused_TaitBryan[TB_YAW_Z]<< count;
+    heading.data = ss.str();
+    ROS_INFO("raw data: %5.2f", data.dmp_TaitBryan[TB_YAW_Z]);
+	// 发布消息
+    ROS_INFO("%s", heading.data.c_str());
+    chatter_pub.publish(heading);
+
+	// 循环等待回调函数
+    ros::spinOnce();
+	
+	// 按照循环频率延时
+    loop_rate.sleep();
+    ++count;
+  }
+
+  return 0;
+}

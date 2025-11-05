@@ -1,0 +1,20 @@
+<launch>
+    <node name="imu" pkg="asv_control" type="imu" >
+      <remap from="/heading" to="/heading/heading_angle" />
+     </node>
+	<node name="headingcontrol" pkg="asv_control" type="heading" ns="heading" output="screen">
+	  <param name="rpm1" value="300.00" />
+      <param name="rpm2" value="600.00" />
+      <param name="rpm3" value="900.00" />
+      <param name="rpm4" value="1200.00" />
+      <param name="l_leftrpm" value="-600.00" />
+      <param name="l_rightrpm" value="600.00" />
+      <param name="r_rightrpm" value="-600.00" />
+      <param name="r_leftrpm" value="600.00" />
+      </node>
+	<node name="joy_node" pkg="asv_control" type="joy">
+		<remap from="/joy" to="/heading/joy" />
+		<param name="autorepeat_rate" value="200" />
+	 </node>
+	<include file="$(find pid)/launch/pid.launch" />
+</launch>

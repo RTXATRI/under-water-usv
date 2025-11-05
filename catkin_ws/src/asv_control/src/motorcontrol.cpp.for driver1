@@ -1,0 +1,74 @@
+/**
+ * subscribe std_msgs::Joy and control the left motor
+ sleep is required to generate pwm signal. To avoid interference between two sigals, seperate nodes are used to deal with two motors
+ */
+
+#include "ros/ros.h"
+#include <sensor_msgs/Joy.h>
+extern "C" {
+#include <stdio.h>
+#include <getopt.h>
+#include <signal.h>
+#include <stdlib.h>  // for atoi() and exit()
+#include <rc/time.h>
+#include <rc/gpio.h>
+#include <rc/adc.h>
+#include <rc/dsm.h>
+#include <rc/servo.h>
+}
+int frequency = 50; //set the frequency of the pwm
+// get in to the callback when message is received
+void joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
+{
+  ROS_INFO("left: [%f],right:left: [%f]", joy->axes[1],joy->axes[3]);//axes[1]left stick updown  axes[3]right stick updown
+  float duty;
+  int period = 1000000/frequency;
+  if(joy->axes[1]>0){
+	  //set the direction of the motor to be forward
+	   rc_gpio_set_value(1, 25, 1);
+	   rc_gpio_set_value(1, 17, 0);
+	  //set the duty
+	  duty = joy->axes[1];
+  }
+  if(joy->axes[1]<0){
+	  
+	  //set the direction of the motor to be backward
+	   rc_gpio_set_value(1, 25, 0);
+	   rc_gpio_set_value(1, 17, 1);  
+	  //set the duty
+	  duty = -joy->axes[1];
+  }
+  //send pwm adjust command
+  rc_servo_send_pulse_us(1, duty*period); 
+  rc_usleep(period*(1.0-duty));
+  //print the received data
+}
+
+int main(int argc, char** argv)
+{
+  //initiate pwm;
+  rc_servo_init();
+  //initiate 4 gpios
+   if(rc_gpio_init(1, 25, GPIOHANDLE_REQUEST_OUTPUT)==-1){
+   printf("rc_gpio_init failed\n");
+   return -1;
+   }
+      if(rc_gpio_init(1, 17, GPIOHANDLE_REQUEST_OUTPUT)==-1){
+   printf("rc_gpio_init failed\n");
+   return -1;
+   }
+/*          if(rc_gpio_init(3, 20, GPIOHANDLE_REQUEST_OUTPUT)==-1){
+   printf("rc_gpio_init failed\n");
+   return -1;
+   }
+            if(rc_gpio_init(3, 17, GPIOHANDLE_REQUEST_OUTPUT)==-1){
+   printf("rc_gpio_init failed\n");
+   return -1;
+   } */
+  ros::init(argc, argv, "leftmotor");
+  ros::NodeHandle leftmotor;
+  //subscribe joy joy topic and start callback function
+  ros::Subscriber sub = leftmotor.subscribe<sensor_msgs::Joy>("joy", 10, joyCallback);
+  ros::spin();
+  return 0;
+}

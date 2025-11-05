@@ -1,0 +1,10 @@
+<launch>
+	<node name="motor_joy" pkg="asv_control" type="motorcontrol" output="screen"> 
+	<param name="frequency" value="200" />
+	</node>
+	<node name="encoder" pkg="asv_control" type="encoder" output="screen"/> 
+	<node name="joy_node" pkg="asv_control" type="joy">
+		<param name="autorepeat_rate" value="200" />
+	</node>
+	<node name="joy_switch" pkg="add" type="joy_switch"/>
+</launch>

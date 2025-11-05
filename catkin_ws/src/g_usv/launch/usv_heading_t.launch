@@ -1,0 +1,36 @@
+<launch>
+	<arg name="port" default="/dev/ttyACM0" />
+ 	<arg name="baud" default="9600" />
+ 	<arg name="frame_id" default="gps" />
+ 	<arg name="use_GNSS_time" default="False" />
+  	<arg name="time_ref_source" default="gps" />
+  	<arg name="useRMC" default="true" />
+	<node name="imu" pkg="g_usv" type="g_imu" >
+	</node>
+	<node name="imu_filter_node" pkg="imu_filter_madgwick" type="imu_filter_node" >
+		<param name = "constant_dt"  value ="0.0"/>
+		<param name = "use_mag" value ="true"/>
+		<param name = "use_magnetic_field_msg"  value ="true"/>	
+		<param name = "world_frame"  value ="enu"/>	
+		<remap from="/imu/mag" to="/sensor/imu/mag" />
+		<remap from="/imu/data" to="/sensor/imu/data" />
+		<remap from="/imu/data_raw" to="/sensor/imu/data_raw" />	
+	</node>
+	<node name="heading_PID" pkg="g_usv" type="heading_PID_GPS" output="screen">
+		<param name = "K_p"  value ="40.0"/>
+		<param name = "K_i"   value ="0.01"/>
+		<param name = "K_d"   value ="20.0"/>
+		<param name = "K_g"   value ="0.001"/>
+		<param name = "Total_thrust" value ="1.6"/>
+	</node>
+	  	<node name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver" >
+   		<param name="port" value="$(arg port)"/>
+    		<param name="baud" value="$(arg baud)" />
+    		<param name="frame_id" value="$(arg frame_id)" />
+    		<param name="use_GNSS_time" value="$(arg use_GNSS_time)" />
+    		<param name="time_ref_source" value="$(arg time_ref_source)" />
+			<remap from="/fix" to="/sensor/m_fix" />
+			<remap from="/vel" to="/sensor/vel" />
+    		<param name="useRMC" value="$(arg useRMC)" />
+  	</node>
+</launch>

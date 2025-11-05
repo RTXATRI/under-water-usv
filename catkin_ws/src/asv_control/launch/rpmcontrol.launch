@@ -1,0 +1,13 @@
+<launch>
+	<node name="encoder" pkg="asv_control" type="encoder" output="screen" >
+      <remap from="/rightrpm" to="/right_motor/rightrpm" />
+     </node>
+	<node name="joy_rpm" pkg="asv_control" type="joy_rpmtest" output="screen" ns="right_motor" >
+      <remap from="/d_rightrpm" to="/right_motor/d_rightrpm" />
+     </node>
+     <node name="set_right_pwm" pkg="asv_control" type="rightpwm" ns="right_motor" output="screen" />
+	 <node name="joy_node" pkg="asv_control" type="joy">
+		<param name="autorepeat_rate" value="50" />
+	 </node>
+	 <include file="$(find pid)/launch/pid.launch" />
+</launch>
